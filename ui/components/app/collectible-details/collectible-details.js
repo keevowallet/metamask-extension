@@ -113,9 +113,14 @@ export default function CollectibleDetails({ collectible }) {
         type: ASSET_TYPES.COLLECTIBLE,
         details: collectible,
       }),
-    ).then(() => {
-      history.push(SEND_ROUTE);
-    });
+    )
+      .then(() => {
+        history.push(SEND_ROUTE);
+      })
+      .catch((error) => {
+        console.log(error);
+        // TODO send message indicating that you can't send because you weren't able to verify ownership
+      });
   };
 
   const renderSendButton = () => {

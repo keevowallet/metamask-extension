@@ -20,7 +20,6 @@ import {
   KNOWN_RECIPIENT_ADDRESS_WARNING,
   MIN_GAS_LIMIT_HEX,
   NEGATIVE_ETH_ERROR,
-  NOT_OWNER_OF_COLLECTIBLE_ERROR,
 } from '../../pages/send/send.constants';
 
 import {
@@ -1077,7 +1076,8 @@ const slice = createSlice({
       state.recipient.mode = action.payload;
     },
     resetSendState: () => initialState,
-    validateAmountField: async (state) => {
+    validateAmountField: (state) => {
+      // let isCurrentOwner = false;
       switch (true) {
         // set error to INSUFFICIENT_FUNDS_ERROR if the account balance is lower
         // than the total price of the transaction inclusive of gas fees.
@@ -1100,21 +1100,7 @@ const slice = createSlice({
           state.amount.error = INSUFFICIENT_TOKENS_ERROR;
           break;
         case state.asset.type === ASSET_TYPES.COLLECTIBLE:
-          let isCurrentOwner = false;
-          try {
-            isCurrentOwner = await isCollectibleOwner(
-              state.account.address,
-              state.asset.details.address,
-              state.asset.details.tokenId,
-            );
-          } catch (error) {
-            if (!error.message.includes('Unable to verify ownership.')) {
-              throw error;
-            }
-          }
-          if (!isCurrentOwner) {
-            state.amount.error = INSUFFICIENT_TOKENS_ERROR;
-          }
+          // TODO verify that this isn't required, becuase there is no amount field
           break;
         // if the amount is negative, set error to NEGATIVE_ETH_ERROR
         // TODO: change this to NEGATIVE_ERROR and remove the currency bias.
@@ -1434,7 +1420,25 @@ export function updateSendAsset({ type, details }) {
 
       await dispatch(hideLoadingIndication());
     } else if (type === ASSET_TYPES.COLLECTIBLE) {
-      balance = '0x1';
+      let isCurrentOwner = true;
+      try {
+        isCurrentOwner = await isCollectibleOwner(
+          getSelectedAddress(state),
+          details.address,
+          details.tokenId,
+        );
+      } catch (error) {
+        if (!error.message.includes('Unable to verify ownership.')) {
+          throw error;
+        }
+      }
+      if (isCurrentOwner) {
+        balance = '0x1';
+      } else {
+        throw new Error(
+          'Send slice initialized as collectible send with a collectible not currently owned by the select account',
+        );
+      }
     } else {
       // if changing to native currency, get it from the account key in send
       // state which is kept in sync when accounts change.
