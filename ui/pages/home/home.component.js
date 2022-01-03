@@ -94,12 +94,13 @@ export default class Home extends PureComponent {
     isSigningQRHardwareTransaction: PropTypes.bool.isRequired,
     newCollectibleAddedMessage: PropTypes.string,
     setNewCollectibleAddedMessage: PropTypes.func.isRequired,
+    closeNotificationPopup: PropTypes.func.isRequired,
   };
 
   state = {
-    // eslint-disable-next-line react/no-unused-state
-    mounted: false,
     canShowBlockageNotification: true,
+    notificationClosing: false,
+    redirecting: false,
   };
 
   checkStatusAndNavigate() {
@@ -108,21 +109,13 @@ export default class Home extends PureComponent {
       history,
       isNotification,
       suggestedAssets = [],
-      totalUnapprovedCount,
       unconfirmedTransactionsCount,
       haveSwapsQuotes,
       showAwaitingSwapScreen,
       swapsFetchParams,
       pendingConfirmations,
-      isSigningQRHardwareTransaction,
     } = this.props;
-    if (
-      isNotification &&
-      totalUnapprovedCount === 0 &&
-      !isSigningQRHardwareTransaction
-    ) {
-      global.platform.closeCurrentWindow();
-    } else if (!isNotification && showAwaitingSwapScreen) {
+    if (!isNotification && showAwaitingSwapScreen) {
       history.push(AWAITING_SWAP_ROUTE);
     } else if (!isNotification && haveSwapsQuotes) {
       history.push(VIEW_QUOTE_ROUTE);
@@ -140,47 +133,45 @@ export default class Home extends PureComponent {
   }
 
   componentDidMount() {
-    // eslint-disable-next-line react/no-unused-state
-    this.setState({ mounted: true });
-    this.checkStatusAndNavigate();
+    if (this.state.notificationClosing) {
+      this.props.closeNotificationPopup();
+    } else {
+      this.checkStatusAndNavigate();
+    }
   }
 
-  static getDerivedStateFromProps(
-    {
-      firstPermissionsRequestId,
-      isNotification,
-      suggestedAssets,
-      totalUnapprovedCount,
-      unconfirmedTransactionsCount,
-      haveSwapsQuotes,
-      showAwaitingSwapScreen,
-      swapsFetchParams,
-      isSigningQRHardwareTransaction,
-    },
-    { mounted },
-  ) {
-    if (!mounted) {
-      if (
-        isNotification &&
-        totalUnapprovedCount === 0 &&
-        !isSigningQRHardwareTransaction
-      ) {
-        return { closing: true };
-      } else if (
-        firstPermissionsRequestId ||
-        unconfirmedTransactionsCount > 0 ||
-        suggestedAssets.length > 0 ||
-        (!isNotification &&
-          (showAwaitingSwapScreen || haveSwapsQuotes || swapsFetchParams))
-      ) {
-        return { redirecting: true };
-      }
+  static getDerivedStateFromProps({
+    firstPermissionsRequestId,
+    isNotification,
+    suggestedAssets,
+    totalUnapprovedCount,
+    unconfirmedTransactionsCount,
+    haveSwapsQuotes,
+    showAwaitingSwapScreen,
+    swapsFetchParams,
+    isSigningQRHardwareTransaction,
+  }) {
+    if (
+      isNotification &&
+      totalUnapprovedCount === 0 &&
+      !isSigningQRHardwareTransaction
+    ) {
+      return { notificationClosing: true };
+    } else if (
+      firstPermissionsRequestId ||
+      unconfirmedTransactionsCount > 0 ||
+      suggestedAssets.length > 0 ||
+      (!isNotification &&
+        (showAwaitingSwapScreen || haveSwapsQuotes || swapsFetchParams))
+    ) {
+      return { redirecting: true };
     }
     return null;
   }
 
   componentDidUpdate(_, prevState) {
     const {
+      closeNotificationPopup,
       setupThreeBox,
       showRestorePrompt,
       threeBoxLastUpdated,
@@ -188,13 +179,17 @@ export default class Home extends PureComponent {
       isNotification,
     } = this.props;
 
-    if (!prevState.closing && this.state.closing) {
-      global.platform.closeCurrentWindow();
-    }
-
-    isNotification && this.checkStatusAndNavigate();
-
-    if (threeBoxSynced && showRestorePrompt && threeBoxLastUpdated === null) {
+    if (this.state.notificationClosing) {
+      if (!prevState.notificationClosing) {
+        closeNotificationPopup();
+      }
+    } else if (isNotification) {
+      this.checkStatusAndNavigate();
+    } else if (
+      threeBoxSynced &&
+      showRestorePrompt &&
+      threeBoxLastUpdated === null
+    ) {
       setupThreeBox();
     }
   }
@@ -435,7 +430,7 @@ export default class Home extends PureComponent {
 
     if (forgottenPassword) {
       return <Redirect to={{ pathname: RESTORE_VAULT_ROUTE }} />;
-    } else if (this.state.closing || this.state.redirecting) {
+    } else if (this.state.notificationClosing || this.state.redirecting) {
       return null;
     }
 
