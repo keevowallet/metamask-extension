@@ -424,6 +424,7 @@
       },
       "packages": {
         "@ethereumjs/tx": true,
+        "@metamask/eth-sig-util": true,
         "buffer": true,
         "ethereum-tx-decoder": true,
         "events": true,
@@ -615,6 +616,16 @@
         "ethereumjs-util": true,
         "events": true,
         "hdkey": true
+      }
+    },
+    "@metamask/eth-sig-util": {
+      "packages": {
+        "buffer": true,
+        "ethereumjs-abi": true,
+        "ethereumjs-util": true,
+        "ethjs-util": true,
+        "tweetnacl": true,
+        "tweetnacl-util": true
       }
     },
     "@metamask/eth-token-tracker": {
