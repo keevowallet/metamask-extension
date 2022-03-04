@@ -2318,12 +2318,13 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@keevowallet/keevo-metamask-keyring@^1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@keevowallet/keevo-metamask-keyring/-/keevo-metamask-keyring-1.0.8.tgz#7fea2c27f60390c12069c8878ec67b7cebfd0e32"
-  integrity sha512-S42ZHOujBelCyfEci4lYGqzrQymJ9PDGyKdwGELcAfHmzqsMaK5T3cpLzHj06PunH1YPDFOW33tK6yTxWBLDPQ==
+"@keevowallet/keevo-metamask-keyring@^1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@keevowallet/keevo-metamask-keyring/-/keevo-metamask-keyring-1.0.10.tgz#520dedfb242bdfbe9170e7efcd09f913fa7000bf"
+  integrity sha512-GPqaEFWxQOG8AYdgX4EK93JSew2fCxV6f80CWSJ/iZMAC3iz8FaaHqTLWJ6KiD198IFjDqaCwwvePl5eb0Q+8g==
   dependencies:
     "@ethereumjs/tx" "^3.2.1"
+    "@metamask/eth-sig-util" "^4.0.0"
     ethereum-tx-decoder "^3.0.0"
     hdkey "^2.0.1"
     keccak "^3.0.2"
@@ -2728,6 +2729,17 @@
     eth-sig-util "^2.0.0"
     ethereumjs-util "^7.0.9"
     hdkey "0.8.0"
+
+"@metamask/eth-sig-util@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@metamask/eth-sig-util/-/eth-sig-util-4.0.0.tgz#11553ba06de0d1352332c1bde28c8edd00e0dcf6"
+  integrity sha512-LczOjjxY4A7XYloxzyxJIHONELmUxVZncpOLoClpEcTiebiVdM46KRPYXGuULro9oNNR2xdVx3yoKiQjdfWmoA==
+  dependencies:
+    ethereumjs-abi "^0.6.8"
+    ethereumjs-util "^6.2.1"
+    ethjs-util "^0.1.6"
+    tweetnacl "^1.0.3"
+    tweetnacl-util "^0.15.1"
 
 "@metamask/eth-token-tracker@^3.0.1":
   version "3.1.0"
@@ -11817,7 +11829,7 @@ ethereumjs-tx@^1.1.1, ethereumjs-tx@^1.2.0, ethereumjs-tx@^1.2.2, ethereumjs-tx@
     ethereum-common "^0.0.18"
     ethereumjs-util "^5.0.0"
 
-ethereumjs-util@6.2.1, ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.0:
+ethereumjs-util@6.2.1, ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.0, ethereumjs-util@^6.2.1:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/ethereumjs-util/-/ethereumjs-util-6.2.1.tgz#fcb4e4dd5ceacb9d2305426ab1a5cd93e3163b69"
   integrity sha512-W2Ktez4L01Vexijrm5EB6w7dg4n/TgpoYU4avuT5T3Vmnw/eCRtiBrJfQYS/DCSvDIOLn2k57GcHdeBcgVxAqw==
@@ -27374,7 +27386,7 @@ tunnel@^0.0.6:
   resolved "https://registry.yarnpkg.com/tunnel/-/tunnel-0.0.6.tgz#72f1314b34a5b192db012324df2cc587ca47f92c"
   integrity sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==
 
-tweetnacl-util@^0.15.0:
+tweetnacl-util@^0.15.0, tweetnacl-util@^0.15.1:
   version "0.15.1"
   resolved "https://registry.yarnpkg.com/tweetnacl-util/-/tweetnacl-util-0.15.1.tgz#b80fcdb5c97bcc508be18c44a4be50f022eea00b"
   integrity sha512-RKJBIj8lySrShN4w6i/BonWp2Z/uxwC3h4y7xsRrpP59ZboCd0GpEVsOnMDYLMmKBpYhb5TgHzZXy7wTfYFBRw==
