@@ -2318,10 +2318,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@keevowallet/keevo-metamask-keyring@^1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@keevowallet/keevo-metamask-keyring/-/keevo-metamask-keyring-1.0.10.tgz#520dedfb242bdfbe9170e7efcd09f913fa7000bf"
-  integrity sha512-GPqaEFWxQOG8AYdgX4EK93JSew2fCxV6f80CWSJ/iZMAC3iz8FaaHqTLWJ6KiD198IFjDqaCwwvePl5eb0Q+8g==
+"@keevowallet/keevo-metamask-keyring@^1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@keevowallet/keevo-metamask-keyring/-/keevo-metamask-keyring-1.0.11.tgz#ff75693938a1493fd6495e25cbf4d0966e74117a"
+  integrity sha512-qPXW5J+l76NNvvMzAMASrease06Wq8DWXGt+Wzz0mjsh2OPYlSdb9ChVB+owyn436toPHNLqHIZPO7pN/hW4mw==
   dependencies:
     "@ethereumjs/tx" "^3.2.1"
     "@metamask/eth-sig-util" "^4.0.0"
