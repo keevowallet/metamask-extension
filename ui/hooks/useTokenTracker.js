@@ -3,7 +3,7 @@ import TokenTracker from '@metamask/eth-token-tracker';
 import { shallowEqual, useSelector } from 'react-redux';
 import { getCurrentChainId, getSelectedAddress } from '../selectors';
 import { SECOND } from '../../shared/constants/time';
-import { isEqualCaseInsensitive } from '../helpers/utils/util';
+import { isEqualCaseInsensitive } from '../../shared/modules/string-utils';
 import { useEqualityCheck } from './useEqualityCheck';
 
 export function useTokenTracker(
@@ -67,6 +67,7 @@ export function useTokenTracker(
         tokens: tokenList,
         includeFailedTokens,
         pollingInterval: SECOND * 8,
+        balanceDecimals: 5,
       });
 
       tokenTracker.current.on('update', updateBalances);

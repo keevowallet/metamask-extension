@@ -15,6 +15,7 @@ export default function NumericInput({
   allowDecimals = true,
   disabled = false,
   dataTestId,
+  placeholder,
 }) {
   return (
     <div
@@ -40,9 +41,14 @@ export default function NumericInput({
         autoFocus={autoFocus}
         disabled={disabled}
         data-testid={dataTestId}
+        placeholder={placeholder}
       />
       {detailText && (
-        <Typography color={COLORS.UI4} variant={TYPOGRAPHY.H7} tag="span">
+        <Typography
+          color={COLORS.TEXT_ALTERNATIVE}
+          variant={TYPOGRAPHY.H7}
+          tag="span"
+        >
           {detailText}
         </Typography>
       )}
@@ -59,4 +65,5 @@ NumericInput.propTypes = {
   allowDecimals: PropTypes.bool,
   disabled: PropTypes.bool,
   dataTestId: PropTypes.string,
+  placeholder: PropTypes.string,
 };

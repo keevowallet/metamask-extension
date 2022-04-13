@@ -70,7 +70,7 @@
     "clipboardWrite",
     "http://localhost:8545/",
     "https://*.infura.io/",
-    "https://wallet.gridplus.io/*",
+    "https://lattice.gridplus.io/*",
     "activeTab",
     "webRequest",
     "*://*.eth/",

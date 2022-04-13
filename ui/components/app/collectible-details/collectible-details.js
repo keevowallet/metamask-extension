@@ -18,11 +18,7 @@ import {
   BLOCK_SIZES,
 } from '../../../helpers/constants/design-system';
 import { useI18nContext } from '../../../hooks/useI18nContext';
-import {
-  getAssetImageURL,
-  isEqualCaseInsensitive,
-  shortenAddress,
-} from '../../../helpers/utils/util';
+import { getAssetImageURL, shortenAddress } from '../../../helpers/utils/util';
 import {
   getCurrentChainId,
   getIpfsGateway,
@@ -30,6 +26,7 @@ import {
   getSelectedIdentity,
 } from '../../../selectors';
 import AssetNavigation from '../../../pages/asset/components/asset-navigation';
+import Copy from '../../ui/icon/copy-icon.component';
 import { getCollectibleContracts } from '../../../ducks/metamask/metamask';
 import { DEFAULT_ROUTE, SEND_ROUTE } from '../../../helpers/constants/routes';
 import {
@@ -48,14 +45,18 @@ import { getEnvironmentType } from '../../../../app/scripts/lib/util';
 import { ENVIRONMENT_TYPE_POPUP } from '../../../../shared/constants/app';
 import CollectibleOptions from '../collectible-options/collectible-options';
 import Button from '../../ui/button';
-import { ASSET_TYPES, updateSendAsset } from '../../../ducks/send';
+import { updateSendAsset } from '../../../ducks/send';
 import InfoTooltip from '../../ui/info-tooltip';
 import { ERC721 } from '../../../helpers/constants/common';
 import { usePrevious } from '../../../hooks/usePrevious';
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
+import { isEqualCaseInsensitive } from '../../../../shared/modules/string-utils';
+import { ASSET_TYPES } from '../../../../shared/constants/transaction';
 
 export default function CollectibleDetails({ collectible }) {
   const {
     image,
+    imageOriginal,
     name,
     description,
     address,
@@ -70,6 +71,7 @@ export default function CollectibleDetails({ collectible }) {
   const ipfsGateway = useSelector(getIpfsGateway);
   const collectibleContracts = useSelector(getCollectibleContracts);
   const currentNetwork = useSelector(getCurrentChainId);
+  const [copied, handleCopy] = useCopyToClipboard();
 
   const collectibleContractName = collectibleContracts.find(
     ({ address: contractAddress }) =>
@@ -78,7 +80,10 @@ export default function CollectibleDetails({ collectible }) {
   const selectedAccountName = useSelector(
     (state) => getSelectedIdentity(state).name,
   );
-  const collectibleImageURL = getAssetImageURL(image, ipfsGateway);
+  const collectibleImageURL = getAssetImageURL(
+    imageOriginal ?? image,
+    ipfsGateway,
+  );
 
   const onRemove = () => {
     dispatch(removeAndIgnoreCollectible(address, tokenId));
@@ -130,6 +135,7 @@ export default function CollectibleDetails({ collectible }) {
       <Box
         display={DISPLAY.FLEX}
         width={inPopUp ? BLOCK_SIZES.FULL : BLOCK_SIZES.HALF}
+        margin={inPopUp ? [4, 0] : null}
       >
         <Button
           type="primary"
@@ -170,10 +176,7 @@ export default function CollectibleDetails({ collectible }) {
             justifyContent={JUSTIFY_CONTENT.CENTER}
             className="collectible-details__card"
           >
-            <img
-              className="collectible-details__image"
-              src={collectibleImageURL}
-            />
+            <img className="collectible-details__image" src={image} />
           </Card>
           <Box
             flexDirection={FLEX_DIRECTION.COLUMN}
@@ -182,47 +185,49 @@ export default function CollectibleDetails({ collectible }) {
           >
             <div>
               <Typography
-                color={COLORS.BLACK}
+                color={COLORS.TEXT_DEFAULT}
                 variant={TYPOGRAPHY.H4}
                 fontWeight={FONT_WEIGHT.BOLD}
-                boxProps={{ margin: 0, marginBottom: 4 }}
+                boxProps={{ margin: 0, marginBottom: 2 }}
               >
                 {name}
               </Typography>
               <Typography
-                color={COLORS.UI3}
+                color={COLORS.TEXT_MUTED}
                 variant={TYPOGRAPHY.H5}
-                boxProps={{ margin: 0 }}
+                boxProps={{ margin: 0, marginBottom: 4 }}
                 overflowWrap={OVERFLOW_WRAP.BREAK_WORD}
               >
                 #{tokenId}
               </Typography>
             </div>
-            <div>
-              <Typography
-                color={COLORS.BLACK}
-                variant={TYPOGRAPHY.H6}
-                fontWeight={FONT_WEIGHT.BOLD}
-                className="collectible-details__description"
-                boxProps={{ margin: 0, marginBottom: 2 }}
-              >
-                {t('description')}
-              </Typography>
-              <Typography
-                color={COLORS.UI4}
-                variant={TYPOGRAPHY.H6}
-                boxProps={{ margin: 0, marginBottom: 4 }}
-              >
-                {description}
-              </Typography>
-            </div>
+            {description ? (
+              <div>
+                <Typography
+                  color={COLORS.TEXT_DEFAULT}
+                  variant={TYPOGRAPHY.H6}
+                  fontWeight={FONT_WEIGHT.BOLD}
+                  className="collectible-details__description"
+                  boxProps={{ margin: 0, marginBottom: 2 }}
+                >
+                  {t('description')}
+                </Typography>
+                <Typography
+                  color={COLORS.TEXT_ALTERNATIVE}
+                  variant={TYPOGRAPHY.H6}
+                  boxProps={{ margin: 0, marginBottom: 4 }}
+                >
+                  {description}
+                </Typography>
+              </div>
+            ) : null}
             {inPopUp ? null : renderSendButton()}
           </Box>
         </div>
         <Box marginBottom={2}>
           <Box display={DISPLAY.FLEX} flexDirection={FLEX_DIRECTION.ROW}>
             <Typography
-              color={COLORS.BLACK}
+              color={COLORS.TEXT_DEFAULT}
               variant={TYPOGRAPHY.H6}
               fontWeight={FONT_WEIGHT.BOLD}
               boxProps={{
@@ -235,27 +240,27 @@ export default function CollectibleDetails({ collectible }) {
               {t('source')}
             </Typography>
             <Typography
-              color={COLORS.PRIMARY1}
+              color={COLORS.PRIMARY_DEFAULT}
               variant={TYPOGRAPHY.H6}
               boxProps={{
                 margin: 0,
                 marginBottom: 4,
               }}
-              overflowWrap={OVERFLOW_WRAP.BREAK_WORD}
+              className="collectible-details__image-link"
             >
               <a
                 target="_blank"
-                href={collectibleImageURL}
                 rel="noopener noreferrer"
-                className="collectible-details__image-link"
+                href={collectibleImageURL}
+                title={collectibleImageURL}
               >
-                {image}
+                {collectibleImageURL}
               </a>
             </Typography>
           </Box>
           <Box display={DISPLAY.FLEX} flexDirection={FLEX_DIRECTION.ROW}>
             <Typography
-              color={COLORS.BLACK}
+              color={COLORS.TEXT_DEFAULT}
               variant={TYPOGRAPHY.H6}
               fontWeight={FONT_WEIGHT.BOLD}
               boxProps={{
@@ -267,32 +272,49 @@ export default function CollectibleDetails({ collectible }) {
             >
               {t('contractAddress')}
             </Typography>
-            <Typography
-              color={COLORS.UI3}
-              variant={TYPOGRAPHY.H6}
-              overflowWrap={OVERFLOW_WRAP.BREAK_WORD}
-              boxProps={{
-                margin: 0,
-                marginBottom: 4,
-              }}
+            <Box
+              display={DISPLAY.FLEX}
+              flexDirection={FLEX_DIRECTION.ROW}
+              className="collectible-details__contract-wrapper"
             >
-              <a
-                target="_blank"
+              <Typography
+                color={COLORS.PRIMARY_DEFAULT}
+                variant={TYPOGRAPHY.H6}
+                overflowWrap={OVERFLOW_WRAP.BREAK_WORD}
+                boxProps={{
+                  margin: 0,
+                  marginBottom: 4,
+                }}
                 className="collectible-details__contract-link"
-                href={getTokenTrackerLink(
-                  address,
-                  currentNetwork,
-                  null,
-                  null,
-                  rpcPrefs,
-                )}
-                rel="noopener noreferrer"
               >
-                {getEnvironmentType() === ENVIRONMENT_TYPE_POPUP
-                  ? shortenAddress(address)
-                  : address}
-              </a>
-            </Typography>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={getTokenTrackerLink(
+                    address,
+                    currentNetwork,
+                    null,
+                    null,
+                    rpcPrefs,
+                  )}
+                  title={address}
+                >
+                  {inPopUp ? shortenAddress(address) : address}
+                </a>
+              </Typography>
+              <button
+                className="collectible-details__contract-copy-button"
+                onClick={() => {
+                  handleCopy(address);
+                }}
+              >
+                {copied ? (
+                  t('copiedExclamation')
+                ) : (
+                  <Copy size={15} color="var(--color-icon-default)" />
+                )}
+              </button>
+            </Box>
           </Box>
           {inPopUp ? renderSendButton() : null}
         </Box>
@@ -312,6 +334,7 @@ CollectibleDetails.propTypes = {
     standard: PropTypes.string,
     imageThumbnail: PropTypes.string,
     imagePreview: PropTypes.string,
+    imageOriginal: PropTypes.string,
     creator: PropTypes.shape({
       address: PropTypes.string,
       config: PropTypes.string,

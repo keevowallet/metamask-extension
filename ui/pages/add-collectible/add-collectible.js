@@ -1,35 +1,68 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { util } from '@metamask/controllers';
 import { useI18nContext } from '../../hooks/useI18nContext';
 import { DEFAULT_ROUTE } from '../../helpers/constants/routes';
 
+import {
+  DISPLAY,
+  FONT_WEIGHT,
+  TYPOGRAPHY,
+} from '../../helpers/constants/design-system';
+
 import Box from '../../components/ui/box';
-import TextField from '../../components/ui/text-field';
+import Typography from '../../components/ui/typography';
+import ActionableMessage from '../../components/ui/actionable-message';
 import PageContainer from '../../components/ui/page-container';
 import {
   addCollectibleVerifyOwnership,
+  removeToken,
   setNewCollectibleAddedMessage,
 } from '../../store/actions';
+import FormField from '../../components/ui/form-field';
+import { getIsMainnet, getUseCollectibleDetection } from '../../selectors';
+import { getCollectiblesDetectionNoticeDismissed } from '../../ducks/metamask/metamask';
+import CollectiblesDetectionNotice from '../../components/app/collectibles-detection-notice';
 
 export default function AddCollectible() {
   const t = useI18nContext();
   const history = useHistory();
   const dispatch = useDispatch();
+  const useCollectibleDetection = useSelector(getUseCollectibleDetection);
+  const isMainnet = useSelector(getIsMainnet);
+  const collectibleDetectionNoticeDismissed = useSelector(
+    getCollectiblesDetectionNoticeDismissed,
+  );
+  const addressEnteredOnImportTokensPage =
+    history?.location?.state?.addressEnteredOnImportTokensPage;
+  const contractAddressToConvertFromTokenToCollectible =
+    history?.location?.state?.tokenAddress;
 
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState(
+    addressEnteredOnImportTokensPage ??
+      contractAddressToConvertFromTokenToCollectible ??
+      '',
+  );
   const [tokenId, setTokenId] = useState('');
   const [disabled, setDisabled] = useState(true);
+  const [collectibleAddFailed, setCollectibleAddFailed] = useState(false);
 
   const handleAddCollectible = async () => {
     try {
-      await dispatch(addCollectibleVerifyOwnership(address, tokenId));
+      await dispatch(
+        addCollectibleVerifyOwnership(address, tokenId.toString()),
+      );
     } catch (error) {
       const { message } = error;
       dispatch(setNewCollectibleAddedMessage(message));
-      history.push(DEFAULT_ROUTE);
+      setCollectibleAddFailed(true);
       return;
+    }
+    if (contractAddressToConvertFromTokenToCollectible) {
+      await dispatch(
+        removeToken(contractAddressToConvertFromTokenToCollectible),
+      );
     }
     dispatch(setNewCollectibleAddedMessage('success'));
     history.push(DEFAULT_ROUTE);
@@ -47,7 +80,7 @@ export default function AddCollectible() {
 
   return (
     <PageContainer
-      title={t('addNFT')}
+      title={t('importNFT')}
       onSubmit={() => {
         handleAddCollectible();
       }}
@@ -60,30 +93,59 @@ export default function AddCollectible() {
       }}
       disabled={disabled}
       contentComponent={
-        <Box padding={4}>
-          <Box>
-            <TextField
-              id="address"
-              label={t('address')}
-              placeholder="0x..."
-              type="text"
-              value={address}
-              onChange={(e) => validateAndSetAddress(e.target.value)}
-              fullWidth
-              autoFocus
-              margin="normal"
+        <Box>
+          {isMainnet &&
+          !useCollectibleDetection &&
+          !collectibleDetectionNoticeDismissed ? (
+            <CollectiblesDetectionNotice />
+          ) : null}
+          {collectibleAddFailed && (
+            <ActionableMessage
+              type="danger"
+              useIcon
+              iconFillColor="var(--color-error-default)"
+              message={
+                <Box display={DISPLAY.INLINE_FLEX}>
+                  <Typography
+                    variant={TYPOGRAPHY.H7}
+                    fontWeight={FONT_WEIGHT.NORMAL}
+                    margin={0}
+                  >
+                    {t('collectibleAddFailedMessage')}
+                  </Typography>
+                  <button
+                    className="fas fa-times add-collectible__close"
+                    title={t('close')}
+                    onClick={() => setCollectibleAddFailed(false)}
+                  />
+                </Box>
+              }
             />
-          </Box>
-          <Box>
-            <TextField
+          )}
+          <Box margin={4}>
+            <FormField
+              id="address"
+              titleText={t('address')}
+              placeholder="0x..."
+              value={address}
+              onChange={(val) => {
+                validateAndSetAddress(val);
+                setCollectibleAddFailed(false);
+              }}
+              tooltipText={t('importNFTAddressToolTip')}
+              autoFocus
+            />
+            <FormField
               id="token-id"
-              label={t('id')}
+              titleText={t('tokenId')}
               placeholder={t('nftTokenIdPlaceholder')}
-              type="number"
               value={tokenId}
-              onChange={(e) => validateAndSetTokenId(e.target.value)}
-              fullWidth
-              margin="normal"
+              onChange={(val) => {
+                validateAndSetTokenId(val);
+                setCollectibleAddFailed(false);
+              }}
+              tooltipText={t('importNFTTokenIdToolTip')}
+              numeric
             />
           </Box>
         </Box>

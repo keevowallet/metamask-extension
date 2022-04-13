@@ -23,6 +23,9 @@ export const BSC_CHAIN_ID = '0x38';
 export const OPTIMISM_CHAIN_ID = '0xa';
 export const OPTIMISM_TESTNET_CHAIN_ID = '0x45';
 export const POLYGON_CHAIN_ID = '0x89';
+export const AVALANCHE_CHAIN_ID = '0xa86a';
+export const FANTOM_CHAIN_ID = '0xfa';
+export const CELO_CHAIN_ID = '0xa4ec';
 
 /**
  * The largest possible chain ID we can handle.
@@ -36,16 +39,19 @@ export const KOVAN_DISPLAY_NAME = 'Kovan';
 export const MAINNET_DISPLAY_NAME = 'Ethereum Mainnet';
 export const GOERLI_DISPLAY_NAME = 'Goerli';
 export const LOCALHOST_DISPLAY_NAME = 'Localhost 8545';
+export const BSC_DISPLAY_NAME = 'Binance Smart Chain';
+export const POLYGON_DISPLAY_NAME = 'Polygon';
+export const AVALANCHE_DISPLAY_NAME = 'Avalanche';
 
 const infuraProjectId = process.env.INFURA_PROJECT_ID;
-const getRpcUrl = (network) =>
-  `https://${network}.infura.io/v3/${infuraProjectId}`;
+export const getRpcUrl = ({ network, excludeProjectId = false }) =>
+  `https://${network}.infura.io/v3/${excludeProjectId ? '' : infuraProjectId}`;
 
-export const ROPSTEN_RPC_URL = getRpcUrl('ropsten');
-export const RINKEBY_RPC_URL = getRpcUrl('rinkeby');
-export const KOVAN_RPC_URL = getRpcUrl('kovan');
-export const MAINNET_RPC_URL = getRpcUrl('mainnet');
-export const GOERLI_RPC_URL = getRpcUrl('goerli');
+export const ROPSTEN_RPC_URL = getRpcUrl({ network: ROPSTEN });
+export const RINKEBY_RPC_URL = getRpcUrl({ network: RINKEBY });
+export const KOVAN_RPC_URL = getRpcUrl({ network: KOVAN });
+export const MAINNET_RPC_URL = getRpcUrl({ network: MAINNET });
+export const GOERLI_RPC_URL = getRpcUrl({ network: GOERLI });
 export const LOCALHOST_RPC_URL = 'http://localhost:8545';
 
 export const ETH_SYMBOL = 'ETH';
@@ -53,11 +59,15 @@ export const WETH_SYMBOL = 'WETH';
 export const TEST_ETH_SYMBOL = 'TESTETH';
 export const BNB_SYMBOL = 'BNB';
 export const MATIC_SYMBOL = 'MATIC';
+export const AVALANCHE_SYMBOL = 'AVAX';
+export const FANTOM_SYMBOL = 'FTM';
+export const CELO_SYMBOL = 'CELO';
 
 export const ETH_TOKEN_IMAGE_URL = './images/eth_logo.svg';
 export const TEST_ETH_TOKEN_IMAGE_URL = './images/black-eth-logo.svg';
 export const BNB_TOKEN_IMAGE_URL = './images/bnb.png';
 export const MATIC_TOKEN_IMAGE_URL = './images/matic-token.png';
+export const AVAX_TOKEN_IMAGE_URL = './images/avax-token.png';
 
 export const INFURA_PROVIDER_TYPES = [ROPSTEN, RINKEBY, KOVAN, MAINNET, GOERLI];
 
@@ -120,6 +130,13 @@ export const CHAIN_ID_TO_RPC_URL_MAP = {
   [LOCALHOST_CHAIN_ID]: LOCALHOST_RPC_URL,
 };
 
+export const CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP = {
+  [MAINNET_CHAIN_ID]: ETH_TOKEN_IMAGE_URL,
+  [AVALANCHE_CHAIN_ID]: AVAX_TOKEN_IMAGE_URL,
+  [BSC_CHAIN_ID]: BNB_TOKEN_IMAGE_URL,
+  [POLYGON_CHAIN_ID]: MATIC_TOKEN_IMAGE_URL,
+};
+
 export const CHAIN_ID_TO_NETWORK_ID_MAP = Object.values(
   NETWORK_TYPE_TO_ID_MAP,
 ).reduce((chainIdToNetworkIdMap, { chainId, networkId }) => {
@@ -132,6 +149,7 @@ export const NATIVE_CURRENCY_TOKEN_IMAGE_MAP = {
   [TEST_ETH_SYMBOL]: TEST_ETH_TOKEN_IMAGE_URL,
   [BNB_SYMBOL]: BNB_TOKEN_IMAGE_URL,
   [MATIC_SYMBOL]: MATIC_TOKEN_IMAGE_URL,
+  [AVALANCHE_SYMBOL]: AVAX_TOKEN_IMAGE_URL,
 };
 
 export const INFURA_BLOCKED_KEY = 'countryBlocked';
@@ -173,3 +191,76 @@ export const UNSUPPORTED_RPC_METHODS = new Set([
 ]);
 
 export const IPFS_DEFAULT_GATEWAY_URL = 'dweb.link';
+
+// The first item in transakCurrencies must be the
+// default crypto currency for the network
+const BUYABLE_CHAIN_ETHEREUM_NETWORK_NAME = 'ethereum';
+
+export const BUYABLE_CHAINS_MAP = {
+  [MAINNET_CHAIN_ID]: {
+    nativeCurrency: ETH_SYMBOL,
+    network: BUYABLE_CHAIN_ETHEREUM_NETWORK_NAME,
+    transakCurrencies: [ETH_SYMBOL, 'USDT', 'USDC', 'DAI'],
+    moonPay: {
+      defaultCurrencyCode: 'eth',
+      showOnlyCurrencies: 'eth,usdt,usdc,dai',
+    },
+  },
+  [ROPSTEN_CHAIN_ID]: {
+    nativeCurrency: ETH_SYMBOL,
+    network: BUYABLE_CHAIN_ETHEREUM_NETWORK_NAME,
+  },
+  [RINKEBY_CHAIN_ID]: {
+    nativeCurrency: ETH_SYMBOL,
+    network: BUYABLE_CHAIN_ETHEREUM_NETWORK_NAME,
+  },
+  [GOERLI_CHAIN_ID]: {
+    nativeCurrency: ETH_SYMBOL,
+    network: BUYABLE_CHAIN_ETHEREUM_NETWORK_NAME,
+  },
+  [KOVAN_CHAIN_ID]: {
+    nativeCurrency: ETH_SYMBOL,
+    network: BUYABLE_CHAIN_ETHEREUM_NETWORK_NAME,
+  },
+  [BSC_CHAIN_ID]: {
+    nativeCurrency: BNB_SYMBOL,
+    network: 'bsc',
+    transakCurrencies: [BNB_SYMBOL, 'BUSD'],
+    moonPay: {
+      defaultCurrencyCode: 'bnb_bsc',
+      showOnlyCurrencies: 'bnb_bsc,busd_bsc',
+    },
+  },
+  [POLYGON_CHAIN_ID]: {
+    nativeCurrency: MATIC_SYMBOL,
+    network: 'polygon',
+    transakCurrencies: [MATIC_SYMBOL, 'USDT', 'USDC', 'DAI'],
+    moonPay: {
+      defaultCurrencyCode: 'matic_polygon',
+      showOnlyCurrencies: 'matic_polygon,usdc_polygon',
+    },
+  },
+  [AVALANCHE_CHAIN_ID]: {
+    nativeCurrency: AVALANCHE_SYMBOL,
+    network: 'avaxcchain',
+    transakCurrencies: [AVALANCHE_SYMBOL],
+    moonPay: {
+      defaultCurrencyCode: 'avax_cchain',
+      showOnlyCurrencies: 'avax_cchain',
+    },
+  },
+  [FANTOM_CHAIN_ID]: {
+    nativeCurrency: FANTOM_SYMBOL,
+    network: 'fantom',
+    transakCurrencies: [FANTOM_SYMBOL],
+  },
+  [CELO_CHAIN_ID]: {
+    nativeCurrency: CELO_SYMBOL,
+    network: 'celo',
+    transakCurrencies: [CELO_SYMBOL],
+    moonPay: {
+      defaultCurrencyCode: 'celo',
+      showOnlyCurrencies: 'celo',
+    },
+  },
+};

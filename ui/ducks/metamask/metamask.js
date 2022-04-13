@@ -11,12 +11,12 @@ import {
   checkNetworkAndAccountSupports1559,
   getAddressBook,
 } from '../../selectors';
-import { updateTransaction } from '../../store/actions';
+import { updateTransactionGasFees } from '../../store/actions';
 import { setCustomGasLimit, setCustomGasPrice } from '../gas/gas.duck';
 import { decGWEIToHexWEI } from '../../helpers/utils/conversions.util';
-import { isEqualCaseInsensitive } from '../../helpers/utils/util';
 
 import { KEYRING_TYPES } from '../../../shared/constants/hardware-wallets';
+import { isEqualCaseInsensitive } from '../../../shared/modules/string-utils';
 
 export default function reduceMetamask(state = {}, action) {
   const metamaskState = {
@@ -209,7 +209,7 @@ const toHexWei = (value, expectHexWei) => {
 };
 
 // Action Creators
-export function updateTransactionGasFees({
+export function updateGasFees({
   gasPrice,
   gasLimit,
   maxPriorityFeePerGas,
@@ -239,7 +239,7 @@ export function updateTransactionGasFees({
       ? addHexPrefix(gasLimit)
       : addHexPrefix(gasLimit.toString(16));
     dispatch(setCustomGasLimit(customGasLimit));
-    await dispatch(updateTransaction(updatedTx));
+    await dispatch(updateTransactionGasFees(updatedTx.id, updatedTx));
   };
 }
 
@@ -258,10 +258,16 @@ export const getWeb3ShimUsageAlertEnabledness = (state) =>
 export const getUnconnectedAccountAlertShown = (state) =>
   state.metamask.unconnectedAccountAlertShownOrigins;
 
+export const getPendingTokens = (state) => state.metamask.pendingTokens;
+
 export const getTokens = (state) => state.metamask.tokens;
 
 export function getCollectiblesDetectionNoticeDismissed(state) {
   return state.metamask.collectiblesDetectionNoticeDismissed;
+}
+
+export function getCollectiblesDropdownState(state) {
+  return state.metamask.collectiblesDropdownState;
 }
 
 export function getEnableEIP1559V2NoticeDismissed(state) {

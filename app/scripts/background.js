@@ -6,7 +6,7 @@ import endOfStream from 'end-of-stream';
 import pump from 'pump';
 import debounce from 'debounce-stream';
 import log from 'loglevel';
-import extension from 'extensionizer';
+import browser from 'webextension-polyfill';
 import { storeAsStream, storeTransformStream } from '@metamask/obs-store';
 import PortStream from 'extension-port-stream';
 import { captureException } from '@sentry/browser';
@@ -16,6 +16,7 @@ import {
   ENVIRONMENT_TYPE_POPUP,
   ENVIRONMENT_TYPE_NOTIFICATION,
   ENVIRONMENT_TYPE_FULLSCREEN,
+  PLATFORM_FIREFOX,
 } from '../../shared/constants/app';
 import { SECOND } from '../../shared/constants/time';
 import {
@@ -38,6 +39,7 @@ import rawFirstTimeState from './first-time-state';
 import getFirstPreferredLangCode from './lib/get-first-preferred-lang-code';
 import getObjStructure from './lib/getObjStructure';
 import setupEnsIpfsResolver from './lib/ens-ipfs/setup';
+import { getPlatform } from './lib/util';
 /* eslint-enable import/first */
 
 const { sentry } = global;
@@ -222,7 +224,7 @@ function setupController(initState, initLangCode) {
     // platform specific api
     platform,
     notificationManager,
-    extension,
+    browser,
     getRequestAccountTabIds: () => {
       return requestAccountTabIds;
     },
@@ -292,8 +294,8 @@ function setupController(initState, initLangCode) {
   //
   // connect to other contexts
   //
-  extension.runtime.onConnect.addListener(connectRemote);
-  extension.runtime.onConnectExternal.addListener(connectExternal);
+  browser.runtime.onConnect.addListener(connectRemote);
+  browser.runtime.onConnectExternal.addListener(connectExternal);
 
   const metamaskInternalProcessHash = {
     [ENVIRONMENT_TYPE_POPUP]: true,
@@ -345,10 +347,19 @@ function setupController(initState, initLangCode) {
    */
   function connectRemote(remotePort) {
     const processName = remotePort.name;
-    const isMetaMaskInternalProcess = metamaskInternalProcessHash[processName];
 
     if (metamaskBlockedPorts.includes(remotePort.name)) {
       return;
+    }
+
+    let isMetaMaskInternalProcess = false;
+    const sourcePlatform = getPlatform();
+
+    if (sourcePlatform === PLATFORM_FIREFOX) {
+      isMetaMaskInternalProcess = metamaskInternalProcessHash[processName];
+    } else {
+      isMetaMaskInternalProcess =
+        remotePort.sender.origin === `chrome-extension://${browser.runtime.id}`;
     }
 
     if (isMetaMaskInternalProcess) {
@@ -414,7 +425,10 @@ function setupController(initState, initLangCode) {
   // communication with page or other extension
   function connectExternal(remotePort) {
     const portStream = new PortStream(remotePort);
-    controller.setupUntrustedCommunication(portStream, remotePort.sender);
+    controller.setupUntrustedCommunication({
+      connectionStream: portStream,
+      sender: remotePort.sender,
+    });
   }
 
   //
@@ -466,8 +480,8 @@ function setupController(initState, initLangCode) {
     if (count) {
       label = String(count);
     }
-    extension.browserAction.setBadgeText({ text: label });
-    extension.browserAction.setBadgeBackgroundColor({ color: '#037DD6' });
+    browser.browserAction.setBadgeText({ text: label });
+    browser.browserAction.setBadgeBackgroundColor({ color: '#037DD6' });
   }
 
   function getUnapprovedTransactionCount() {
@@ -612,7 +626,7 @@ async function openPopup() {
 }
 
 // On first install, open a new tab with MetaMask
-extension.runtime.onInstalled.addListener(({ reason }) => {
+browser.runtime.onInstalled.addListener(({ reason }) => {
   if (
     reason === 'install' &&
     !(process.env.METAMASK_DEBUG || process.env.IN_TEST)

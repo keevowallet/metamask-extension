@@ -88,6 +88,9 @@
  *  is closed in an affirmative action.
  * @property {string} [failureEvent] - The event name to fire when the fragment
  *  is closed with a rejection.
+ * @property {string} [initialEvent] - An event name to fire immediately upon
+ *  fragment creation. This is useful for building funnels in mixpanel and for
+ *  reduction of code duplication.
  * @property {string} category - the event category to use for both the success
  *  and failure events
  * @property {boolean} [persist] - Should this fragment be persisted in
@@ -113,6 +116,10 @@
  *  occurred on
  * @property {MetaMetricsReferrerObject} [referrer] - the origin of the dapp
  *  that initiated the event fragment.
+ * @property {string} [uniqueIdentifier] - optional argument to override the
+ *  automatic generation of UUID for the event fragment. This is useful when
+ *  tracking events for subsystems that already generate UUIDs so to avoid
+ *  unnecessary lookups and reduce accidental duplication.
  */
 
 /**
@@ -146,6 +153,33 @@
  *  the onboarding workflow? If true and participateInMetaMetrics is null track
  *  the page view
  */
+
+/**
+ * @typedef {Object} Traits
+ * @property {string} [LEDGER_CONNECTION_TYPE] - when ledger live connnection
+ * type is changed we identify the ledger_connection_type trait
+ * @property {string} [NETWORKS_ADDED] - when user modifies networks we
+ * identify the networks_added trait
+ * @property {string} [NUMBER_OF_ACCOUNTS] - when identities change, we
+ * identify the new number_of_accounts trait
+ * @property {number_of_nft_collections} [NUMBER_OF_NFT_COLLECTIONS] - user trait for number of
+ * unique NFT addresses
+ * @property {string} [THREE_BOX_ENABLED] - when 3box feature is toggled we
+ * identify the 3box_enabled trait
+ */
+
+/**
+ *
+ * @type {Traits}
+ */
+
+export const TRAITS = {
+  LEDGER_CONNECTION_TYPE: 'ledger_connection_type',
+  NETWORKS_ADDED: 'networks_added',
+  NUMBER_OF_ACCOUNTS: 'number_of_accounts',
+  NUMBER_OF_NFT_COLLECTIONS: 'number_of_nft_collections',
+  THREE_BOX_ENABLED: 'three_box_enabled',
+};
 
 // Mixpanel converts the zero address value to a truly anonymous event, which
 // speeds up reporting
@@ -182,3 +216,10 @@ export const METAMETRICS_BACKGROUND_PAGE_OBJECT = {
 export const REJECT_NOTFICIATION_CLOSE = 'Cancel Via Notification Close';
 export const REJECT_NOTFICIATION_CLOSE_SIG =
   'Cancel Sig Request Via Notification Close';
+
+export const EVENT_NAMES = {
+  SIGNATURE_REQUESTED: 'Signature Requested',
+  ENCRYPTION_PUBLIC_KEY_REQUESTED: 'Encryption Public Key Requested',
+  DECRYPTION_REQUESTED: 'Decryption Requested',
+  PERMISSIONS_REQUESTED: 'Permissions Requested',
+};

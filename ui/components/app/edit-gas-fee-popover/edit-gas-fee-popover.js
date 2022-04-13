@@ -6,6 +6,7 @@ import {
 } from '../../../../shared/constants/gas';
 import { useI18nContext } from '../../../hooks/useI18nContext';
 import { useTransactionModalContext } from '../../../contexts/transaction-modal';
+import Box from '../../ui/box';
 import ErrorMessage from '../../ui/error-message';
 import I18nValue from '../../ui/i18n-value';
 import Popover from '../../ui/popover';
@@ -43,7 +44,9 @@ const EditGasFeePopover = () => {
     <Popover
       title={t(popupTitle)}
       // below logic ensures that back button is visible only if there are other modals open before this.
-      onBack={openModalCount === 1 ? undefined : () => closeModal('editGasFee')}
+      onBack={
+        openModalCount === 1 ? undefined : () => closeModal(['editGasFee'])
+      }
       onClose={closeAllModals}
       className="edit-gas-fee-popover"
     >
@@ -51,60 +54,64 @@ const EditGasFeePopover = () => {
         <AppLoadingSpinner />
         <div className="edit-gas-fee-popover__wrapper">
           <div className="edit-gas-fee-popover__content">
-            {balanceError && (
-              <ErrorMessage errorKey={INSUFFICIENT_FUNDS_ERROR_KEY} />
-            )}
-            <div className="edit-gas-fee-popover__content__header">
-              <span className="edit-gas-fee-popover__content__header-option">
-                <I18nValue messageKey="gasOption" />
-              </span>
-              <span className="edit-gas-fee-popover__content__header-time">
-                {editGasMode !== EDIT_GAS_MODES.SWAPS && (
-                  <I18nValue messageKey="time" />
-                )}
-              </span>
-              <span className="edit-gas-fee-popover__content__header-max-fee">
-                <I18nValue messageKey="maxFee" />
-              </span>
-            </div>
-            {(editGasMode === EDIT_GAS_MODES.CANCEL ||
-              editGasMode === EDIT_GAS_MODES.SPEED_UP) && (
-              <EditGasItem
-                priorityLevel={PRIORITY_LEVELS.TEN_PERCENT_INCREASED}
-              />
-            )}
-            {editGasMode === EDIT_GAS_MODES.MODIFY_IN_PLACE && (
-              <EditGasItem priorityLevel={PRIORITY_LEVELS.LOW} />
-            )}
-            <EditGasItem priorityLevel={PRIORITY_LEVELS.MEDIUM} />
-            <EditGasItem priorityLevel={PRIORITY_LEVELS.HIGH} />
-            <div className="edit-gas-fee-popover__content__separator" />
-            {editGasMode === EDIT_GAS_MODES.MODIFY_IN_PLACE && (
-              <EditGasItem priorityLevel={PRIORITY_LEVELS.DAPP_SUGGESTED} />
-            )}
-            <EditGasItem priorityLevel={PRIORITY_LEVELS.CUSTOM} />
-            <NetworkStatistics />
-            <Typography
-              className="edit-gas-fee-popover__know-more"
-              align="center"
-              color={COLORS.UI4}
-              tag={TYPOGRAPHY.Paragraph}
-              variant={TYPOGRAPHY.H7}
-            >
-              <I18nValue
-                messageKey="learmMoreAboutGas"
-                options={[
-                  <a
-                    key="learnMoreLink"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://metamask.zendesk.com/hc/en-us/articles/4404600179227-User-Guide-Gas"
-                  >
-                    <I18nValue messageKey="learnMore" />
-                  </a>,
-                ]}
-              />
-            </Typography>
+            <Box>
+              {balanceError && (
+                <ErrorMessage errorKey={INSUFFICIENT_FUNDS_ERROR_KEY} />
+              )}
+              <div className="edit-gas-fee-popover__content__header">
+                <span className="edit-gas-fee-popover__content__header-option">
+                  <I18nValue messageKey="gasOption" />
+                </span>
+                <span className="edit-gas-fee-popover__content__header-time">
+                  {editGasMode !== EDIT_GAS_MODES.SWAPS && (
+                    <I18nValue messageKey="time" />
+                  )}
+                </span>
+                <span className="edit-gas-fee-popover__content__header-max-fee">
+                  <I18nValue messageKey="maxFee" />
+                </span>
+              </div>
+              {(editGasMode === EDIT_GAS_MODES.CANCEL ||
+                editGasMode === EDIT_GAS_MODES.SPEED_UP) && (
+                <EditGasItem
+                  priorityLevel={PRIORITY_LEVELS.TEN_PERCENT_INCREASED}
+                />
+              )}
+              {editGasMode === EDIT_GAS_MODES.MODIFY_IN_PLACE && (
+                <EditGasItem priorityLevel={PRIORITY_LEVELS.LOW} />
+              )}
+              <EditGasItem priorityLevel={PRIORITY_LEVELS.MEDIUM} />
+              <EditGasItem priorityLevel={PRIORITY_LEVELS.HIGH} />
+              <div className="edit-gas-fee-popover__content__separator" />
+              {editGasMode === EDIT_GAS_MODES.MODIFY_IN_PLACE && (
+                <EditGasItem priorityLevel={PRIORITY_LEVELS.DAPP_SUGGESTED} />
+              )}
+              <EditGasItem priorityLevel={PRIORITY_LEVELS.CUSTOM} />
+            </Box>
+            <Box>
+              <NetworkStatistics />
+              <Typography
+                className="edit-gas-fee-popover__know-more"
+                align="center"
+                color={COLORS.TEXT_ALTERNATIVE}
+                tag={TYPOGRAPHY.Paragraph}
+                variant={TYPOGRAPHY.H7}
+              >
+                <I18nValue
+                  messageKey="learmMoreAboutGas"
+                  options={[
+                    <a
+                      key="learnMoreLink"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://metamask.zendesk.com/hc/en-us/articles/4404600179227-User-Guide-Gas"
+                    >
+                      <I18nValue messageKey="learnMore" />
+                    </a>,
+                  ]}
+                />
+              </Typography>
+            </Box>
           </div>
         </div>
       </>

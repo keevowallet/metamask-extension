@@ -41,6 +41,8 @@ describe('Confirm Page Container Container Test', () => {
       chainId: 'test',
       identities: [],
       featureFlags: {},
+      enableEIP1559V2NoticeDismissed: true,
+      tokenList: {},
     },
   };
 

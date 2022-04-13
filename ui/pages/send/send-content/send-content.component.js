@@ -9,7 +9,7 @@ import {
   GAS_PRICE_EXCESSIVE_ERROR_KEY,
   INSUFFICIENT_FUNDS_FOR_GAS_ERROR_KEY,
 } from '../../../helpers/constants/error-keys';
-import { ASSET_TYPES } from '../../../ducks/send';
+import { ASSET_TYPES } from '../../../../shared/constants/transaction';
 import SendAmountRow from './send-amount-row';
 import SendHexDataRow from './send-hex-data-row';
 import SendAssetRow from './send-asset-row';
@@ -37,6 +37,7 @@ export default class SendContent extends Component {
     getIsBalanceInsufficient: PropTypes.bool,
     asset: PropTypes.object,
     to: PropTypes.string,
+    assetError: PropTypes.string,
   };
 
   render() {
@@ -49,6 +50,7 @@ export default class SendContent extends Component {
       networkOrAccountNotSupports1559,
       getIsBalanceInsufficient,
       asset,
+      assetError,
     } = this.props;
 
     let gasError;
@@ -67,6 +69,7 @@ export default class SendContent extends Component {
     return (
       <PageContainerContent>
         <div className="send-v2__form">
+          {assetError ? this.renderError(assetError) : null}
           {gasError ? this.renderError(gasError) : null}
           {isEthGasPrice
             ? this.renderWarning(ETH_GAS_PRICE_FETCH_WARNING_KEY)

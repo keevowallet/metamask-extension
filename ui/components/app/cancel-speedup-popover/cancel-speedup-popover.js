@@ -54,7 +54,7 @@ const CancelSpeedupPopover = () => {
     const gasUsedLessThanMedium =
       gasFeeEstimates &&
       gasEstimateGreaterThanGasUsedPlusTenPercent(
-        transaction,
+        transaction.txParams,
         gasFeeEstimates,
         PRIORITY_LEVELS.MEDIUM,
       );
@@ -62,7 +62,7 @@ const CancelSpeedupPopover = () => {
       updateTransactionUsingEstimate(PRIORITY_LEVELS.MEDIUM);
       return;
     }
-    updateTransactionToTenPercentIncreasedGasFee();
+    updateTransactionToTenPercentIncreasedGasFee(true);
   }, [
     appIsLoading,
     currentModal,
@@ -84,7 +84,7 @@ const CancelSpeedupPopover = () => {
     } else {
       speedUpTransaction();
     }
-    closeModal('cancelSpeedUpTransaction');
+    closeModal(['cancelSpeedUpTransaction']);
   };
 
   return (
@@ -96,7 +96,7 @@ const CancelSpeedupPopover = () => {
             : `🚀${t('speedUp')}`}
         </>
       }
-      onClose={() => closeModal('cancelSpeedUpTransaction')}
+      onClose={() => closeModal(['cancelSpeedUpTransaction'])}
       className="cancel-speedup-popover"
     >
       <AppLoadingSpinner className="cancel-speedup-popover__spinner" />
@@ -142,7 +142,7 @@ const CancelSpeedupPopover = () => {
           marginTop={4}
         >
           <Box className="cancel-speedup-popover__edit-gas-button">
-            <EditGasFeeButton />
+            {!appIsLoading && <EditGasFeeButton />}
           </Box>
           <Box className="cancel-speedup-popover__gas-details">
             <GasDetailsItem />

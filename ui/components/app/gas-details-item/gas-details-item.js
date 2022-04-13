@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 
 import { COLORS } from '../../../helpers/constants/design-system';
 import { PRIMARY, SECONDARY } from '../../../helpers/constants/common';
-import { hexWEIToDecGWEI } from '../../../helpers/utils/conversions.util';
 import { getPreferences } from '../../../selectors';
 import { useGasFeeContext } from '../../../contexts/gasFee';
 
@@ -23,7 +22,8 @@ const GasDetailsItem = ({ userAcknowledgedGasMissing = false }) => {
     hasSimulationError,
     maximumCostInHexWei: hexMaximumTransactionFee,
     minimumCostInHexWei: hexMinimumTransactionFee,
-    transaction,
+    maxPriorityFeePerGas,
+    maxFeePerGas,
   } = useGasFeeContext();
 
   const { useNativeCurrencyAsPrimaryCurrency } = useSelector(getPreferences);
@@ -36,10 +36,10 @@ const GasDetailsItem = ({ userAcknowledgedGasMissing = false }) => {
     <TransactionDetailItem
       key="gas-item"
       detailTitle={<GasDetailsItemTitle />}
-      detailTitleColor={COLORS.BLACK}
+      detailTitleColor={COLORS.TEXT_DEFAULT}
       detailText={
         <div className="gas-details-item__currency-container">
-          <LoadingHeartBeat />
+          <LoadingHeartBeat estimateUsed={estimateUsed} />
           <UserPreferencedCurrencyDisplay
             type={SECONDARY}
             value={hexMinimumTransactionFee}
@@ -49,7 +49,7 @@ const GasDetailsItem = ({ userAcknowledgedGasMissing = false }) => {
       }
       detailTotal={
         <div className="gas-details-item__currency-container">
-          <LoadingHeartBeat />
+          <LoadingHeartBeat estimateUsed={estimateUsed} />
           <UserPreferencedCurrencyDisplay
             type={PRIMARY}
             value={hexMinimumTransactionFee}
@@ -66,7 +66,7 @@ const GasDetailsItem = ({ userAcknowledgedGasMissing = false }) => {
               'gas-details-item__gas-fee-warning': estimateUsed === 'high',
             })}
           >
-            <LoadingHeartBeat />
+            <LoadingHeartBeat estimateUsed={estimateUsed} />
             <Box marginRight={1}>
               <strong>
                 {estimateUsed === 'high' && '⚠ '}
@@ -77,7 +77,7 @@ const GasDetailsItem = ({ userAcknowledgedGasMissing = false }) => {
               key="editGasSubTextFeeValue"
               className="gas-details-item__currency-container"
             >
-              <LoadingHeartBeat />
+              <LoadingHeartBeat estimateUsed={estimateUsed} />
               <UserPreferencedCurrencyDisplay
                 key="editGasSubTextFeeAmount"
                 type={PRIMARY}
@@ -90,10 +90,8 @@ const GasDetailsItem = ({ userAcknowledgedGasMissing = false }) => {
       }
       subTitle={
         <GasTiming
-          maxPriorityFeePerGas={hexWEIToDecGWEI(
-            transaction.txParams.maxPriorityFeePerGas,
-          )}
-          maxFeePerGas={hexWEIToDecGWEI(transaction.txParams.maxFeePerGas)}
+          maxPriorityFeePerGas={maxPriorityFeePerGas}
+          maxFeePerGas={maxFeePerGas}
         />
       }
     />

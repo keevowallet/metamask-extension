@@ -1,16 +1,21 @@
+import { constant, times, uniq, zip } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { addHexPrefix } from 'ethereumjs-util';
-
+import { GAS_RECOMMENDATIONS } from '../../../shared/constants/gas';
 import { multiplyCurrencies } from '../../../shared/modules/conversion.utils';
-import { bnGreaterThan } from './util';
+import {
+  bnGreaterThan,
+  isNullish,
+  roundToDecimalPlacesRemovingExtraZeroes,
+} from './util';
 import { hexWEIToDecGWEI } from './conversions.util';
 
 export const gasEstimateGreaterThanGasUsedPlusTenPercent = (
-  transaction,
+  gasUsed,
   gasFeeEstimates,
   estimate,
 ) => {
-  let { maxFeePerGas: maxFeePerGasInTransaction } = transaction.txParams;
+  let { maxFeePerGas: maxFeePerGasInTransaction } = gasUsed;
   maxFeePerGasInTransaction = new BigNumber(
     hexWEIToDecGWEI(addTenPercentAndRound(maxFeePerGasInTransaction)),
   );
@@ -52,4 +57,52 @@ export function addTenPercent(hexStringValue, conversionOptions = {}) {
  */
 export function addTenPercentAndRound(hexStringValue) {
   return addTenPercent(hexStringValue, { numberOfDecimals: 0 });
+}
+
+export function isMetamaskSuggestedGasEstimate(estimate) {
+  return [
+    GAS_RECOMMENDATIONS.HIGH,
+    GAS_RECOMMENDATIONS.MEDIUM,
+    GAS_RECOMMENDATIONS.LOW,
+  ].includes(estimate);
+}
+
+/**
+ * Formats a singular gas fee or a range of gas fees by rounding them to the
+ * given precisions and then arranging them as a string.
+ *
+ * @param {string | [string, string] | null | undefined} feeOrFeeRange - The fee
+ * in GWEI or range of fees in GWEI.
+ * @param {object} options - The options.
+ * @param {number | [number, number]} options.precision - The precision(s) to
+ * use when formatting the fee(s).
+ * @returns A string which represents the formatted version of the fee or fee
+ * range.
+ */
+export function formatGasFeeOrFeeRange(
+  feeOrFeeRange,
+  { precision: precisionOrPrecisions = 2 } = {},
+) {
+  if (
+    isNullish(feeOrFeeRange) ||
+    (Array.isArray(feeOrFeeRange) && feeOrFeeRange.length === 0)
+  ) {
+    return null;
+  }
+
+  const range = Array.isArray(feeOrFeeRange)
+    ? feeOrFeeRange.slice(0, 2)
+    : [feeOrFeeRange];
+  const precisions = Array.isArray(precisionOrPrecisions)
+    ? precisionOrPrecisions.slice(0, 2)
+    : times(range.length, constant(precisionOrPrecisions));
+  const formattedRange = uniq(
+    zip(range, precisions).map(([fee, precision]) => {
+      return precision === undefined
+        ? fee
+        : roundToDecimalPlacesRemovingExtraZeroes(fee, precision);
+    }),
+  ).join(' - ');
+
+  return `${formattedRange} GWEI`;
 }
