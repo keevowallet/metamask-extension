@@ -23,6 +23,7 @@ describe('Confirm Page Container Content', () => {
           },
         },
       },
+      eip1559V2Enabled: false,
     },
   };
 

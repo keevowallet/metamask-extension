@@ -110,6 +110,7 @@
     "@ethereumjs/tx": "^3.2.1",
     "@formatjs/intl-relativetimeformat": "^5.2.6",
     "@fortawesome/fontawesome-free": "^5.13.0",
+    "@keevowallet/keevo-metamask-keyring": "^1.0.10",
     "@keystonehq/bc-ur-registry-eth": "^0.6.8",
     "@keystonehq/metamask-airgapped-keyring": "0.2.1",
     "@material-ui/core": "^4.11.0",
@@ -437,7 +438,8 @@
       "@metamask/iframe-execution-environment-service>@metamask/execution-environments": false,
       "@metamask/snap-controllers>@metamask/execution-environments": false,
       "@metamask/iframe-execution-environment-service>@metamask/snap-controllers>@metamask/execution-environments": false,
-      "@metamask/rpc-methods>@metamask/snap-controllers>@metamask/execution-environments": false
+      "@metamask/rpc-methods>@metamask/snap-controllers>@metamask/execution-environments": false,
+      "@keevowallet/keevo-metamask-keyring": false
     }
   }
 }

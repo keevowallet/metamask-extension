@@ -3031,6 +3031,12 @@
   "statusNotConnected": {
     "message": "Not connected"
   },
+  "step1KeevoWallet": {
+    "message": "Make sure your Keevo Wallet is connected"
+  },
+  "step1KeevoWalletMsg": {
+    "message": "Connect your Keevo wallet directly to your computer, unlock the device. Run Keevo LINK application, and do sign in."
+  },
   "step1LatticeWallet": {
     "message": "Make sure your Lattice1 is ready to connect"
   },
